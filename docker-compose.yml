@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  web:
+    build: ./nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./public_html:/public_html
+      - ./conf.d:/etc/nginx/conf.d
+      - /etc/localtime:/etc/localtime
+    networks:
+      - nginxphp
+  php:
+    build: ./php
+    volumes:
+      - ./public_html:/public_html
+    expose:
+      - 9000
+    networks:
+      - nginxphp
+      - backend
+    environment:
+      - MYSQL_HOST=mysql-app
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DB=wp
+  mysql:
+    build: ./mysql
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - MYSQL_DATABASE=wp
+    container_name: mysql-app
+networks:
+  nginxphp:
+  backend:
